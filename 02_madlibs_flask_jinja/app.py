@@ -10,9 +10,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("home.html", story.prompts)
+    return render_template("home.html", prompts=story.prompts)
 
 
-@app.route("/story")
+@app.route("/story", methods=["POST"])
 def story_route():
-    return render_template("story.html", story=story.generate(request.args))
+    return render_template("story.html", story=story.generate(request.form))
