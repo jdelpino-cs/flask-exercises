@@ -2,16 +2,16 @@
 
 {% block content %}
 
-    <h2>Welcome to my Madlibs site!</h2>
-    <h2>Generate a Story!</h2>
+<h2>Welcome to my Madlibs site!</h2>
+<h2>Generate a Story!</h2>
 
-    <form action="/story" method="POST">
-        {% for prompt in prompts %}
-            <label for="{{ prompt }}">{{ prompt.capitalize() +":" }}</label>
-            <input type="text" name="{{ prompt }}" id="{{ prompt }}" />
-            <br><br>
-        {% endfor %}
-        <button type="submit">Submit</button>
-    </form>
+<form action="/story" method="POST">
+    {% for prompt in prompts %}
+    <label for="{{ prompt }}">{{ prompt.capitalize() +":" }}</label>
+    <input type="text" name="{{ prompt }}" id="{{ prompt }}" />
+    <br><br>
+    {% endfor %}
+    <button type="submit">Submit</button>
+</form>
 
 {% endblock %}
