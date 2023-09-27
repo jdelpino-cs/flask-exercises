@@ -11,7 +11,8 @@ responses = []
 @app.route("/")
 def home():
     """Show the home page."""
-    return render_template("home.html")
+    return render_template("home.html",
+                           survey=satisfaction_survey)
 
 
 @app.route("/questions/<question_number>")
