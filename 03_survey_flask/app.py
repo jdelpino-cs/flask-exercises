@@ -1,8 +1,14 @@
 from flask import Flask, request, render_template, redirect
+from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
 
 # Create the Flask app
 app = Flask(__name__)
+
+# Required to use Flask sessions and the debug toolbar
+app.config['SECRET_KEY'] = "chickenzarecoo121837"
+debug = DebugToolbarExtension(app)
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # Tracks user responses to a survey
 responses = []
@@ -27,11 +33,12 @@ def question(question_number):
                 question_number=question_number,
                 question=satisfaction_survey.questions[question_number])
         )
-    elif question_number >= len(satisfaction_survey.questions):
+    elif (question_number >= len(satisfaction_survey.questions)
+          and question_number == len(responses)):
         return render_template('thank_you.html',
                                survey=satisfaction_survey)
     else:
-        return render_template("error.html")
+        return redirect(f"/questions/{len(responses)}")
 
 
 @app.route("/answer", methods=["POST"])
