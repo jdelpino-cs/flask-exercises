@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, flash
+from flask import Flask, request, render_template, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
 
@@ -7,11 +7,10 @@ app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
 app.config['SECRET_KEY'] = "chickenzarecoo121837"
+
+# Initialize the debug toolbar and disable redirects
 debug = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-
-# Tracks user responses to a survey
-responses = []
 
 
 @app.route("/")
@@ -21,11 +20,19 @@ def home():
                            survey=satisfaction_survey)
 
 
+@app.route("/start")
+def start():
+    """Clear the session of responses."""
+    session["responses"] = []
+    session.modified = True
+    return redirect("/questions/0")
+
+
 @app.route("/questions/<question_number>")
 def question(question_number):
     question_number = int(question_number)
     if (question_number < len(satisfaction_survey.questions)
-            and question_number == len(responses)):
+            and question_number == len(session["responses"])):
         return (
             render_template(
                 'question.html',
@@ -34,7 +41,7 @@ def question(question_number):
                 question=satisfaction_survey.questions[question_number])
         )
     elif (question_number >= len(satisfaction_survey.questions)
-          and question_number == len(responses)):
+          and question_number == len(session["responses"])):
         return render_template('thank_you.html',
                                survey=satisfaction_survey)
     else:
@@ -42,12 +49,14 @@ def question(question_number):
             "You tried invalid question number…"
             "And we redirected you to the current question."
         )
-        return redirect(f"/questions/{len(responses)}")
+        return redirect(f'/questions/{len(session["responses"])}')
 
 
 @app.route("/answer", methods=["POST"])
 def answer():
     """Add answer to responses and redirect to next question."""
     answer = request.form["choice"]
+    responses = session["responses"]
     responses.append(answer)
-    return redirect(f"/questions/{len(responses)}")
+    session["responses"] = responses
+    return redirect(f'/questions/{len(session["responses"])}')
